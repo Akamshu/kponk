@@ -1,0 +1,291 @@
+<?php
+	require_once("views/layout/staff_session.php");
+	require_once("views/layout/connection.php");
+	require_once("views/layout/functions.php");
+?>
+<?php
+	//////////////// DEFAULT NULL VALUES ///////////////
+	$error = array();
+	$date = date('d F, Y');
+	$select = "--select--";
+	$time = date('l,h:i:s A');
+?>
+if(isset($_POST['view_class_btn'])){
+///////////// POST ACTION TO SHOW ALL ADDED CLASS IF THE BUTTON IS CLICKED ////////////
+$query = " SELECT * FROM `classes` ";
+$run_query = mysqli_query($connection, $query);
+if(mysqli_num_rows($run_query) > 0){
+$i = 0;
+echo"
+<div class='table-responsive'>
+	<table class='table table-striped'>
+		<thead>
+			<tr>
+				<th>S/N</th>
+				<th>Classes</th>
+				<th>Action</th>
+			</tr>
+		</thead>";
+		while($result = mysqli_fetch_assoc($run_query)){
+		$i++;
+		$class_id = $result['id'];
+		$all_class = $result['classes'];
+		echo"
+		<tbody>
+			<tr>
+				<td>{$i}</td>
+				<td>$all_class</td>
+				<td>
+					<form method='POST' action=''>
+						<input type='hidden' name='hide_class_del' value='{$class_id}' />
+						<input type='submit' name='delete_class_btn' value='Delete' class='btn btn-xs btn-danger' />
+					</form>
+				</td>
+			</tr>
+		</tbody>
+		";
+		}
+		echo"
+	</table>
+</div>";
+}
+}
+echo"
+</div>
+</div>
+";
+
+
+
+
+
+elseif(isset($_GET['register_new_student'])){
+require_once("staff_dashboard_processor.php");
+
+foreach($error as $msg){
+echo "<h4 class='text-danger'>{$msg}</h4>";
+}
+
+echo"
+<div class='panel panel-primary'>
+	<div class='panel-heading'>
+		<h3 class='text-center'>Register New Student</h3>
+	</div>
+	<div class='panel-body'>
+		<form method='POST' enctype='multipart/form-data' action='staff_dashboard.php?register_new_student'>
+			<p class='text-warning noprint'><b><u>Please Note that Registration is Unique to a particular Session, Make
+						Sure that your Current Session has been Declared to avoid clashing of Students Registration
+						Number. To Declare Current Session, Click on the Administratives Tab !!!</u></b></p>
+			<legend>Students Bio-Data</legend>
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Gender:</span>
+				<select class='form-control' name='reg_student_gender'>
+					<option selected>"; echo $select; echo "</option>
+					<option value='male'>Male</option>
+					<option value='female'>Female</option>
+				</select>
+			</div>
+			<br />
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>First Name:</span>
+				<input type='text' name='reg_student_firstname' required class='form-control'
+					placeholder='Enter first name (surname)' aria-describedby='basic-addon2'>
+			</div>
+			<br />
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Last Name:</span>
+				<input type='text' name='reg_student_lastname' required class='form-control'
+					placeholder='Enter last name' aria-describedby='basic-addon2'>
+			</div>
+			<br />
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Other Name:</span>
+				<input type='text' name='reg_student_othername' class='form-control'
+					placeholder='Enter other name (optional)' aria-describedby='basic-addon2'>
+			</div>
+			<br />
+			<div class='row'>
+				<div class='col-md-4 col-sm-4 col-xs-12'>
+					<br />
+					<div class='input-group'>
+						<span class='input-group-addon' id='basic-addon2'>D O B:</span>
+						<select class='form-control' name='reg_student_dob' style='width: 100%; float: left;'>
+							<option selected>"; echo $select; echo "</option>";
+							for($dob = 1; $dob <= 31; $dob++){ echo "<option>{$dob}</option>" ; } echo" </select>
+					</div>
+				</div>
+				<div class='col-md-4 col-sm-4 col-xs-12'>
+					<br />
+					<div class='input-group'>
+						<span class='input-group-addon' id='basic-addon2'>MONTH:</span>
+						<select class='form-control' name='reg_student_mob' style='width: 100%; float: left;'>
+							<option selected>"; echo $select; echo "</option>";
+
+							$month_array = array("January", "February", "March", "April", "May", "June", "July",
+							"August", "September", "October", "November", "December");
+
+							foreach($month_array as $month){
+							echo "<option>{$month}</option><br>";
+							}
+							echo"
+						</select>
+					</div>
+				</div>
+				<div class='col-md-4 col-sm-4 col-xs-12'>
+					<br />
+					<div class='input-group'>
+						<span class='input-group-addon' id='basic-addon2'>YEAR:</span>
+						<select class='form-control' name='reg_student_yob' style='width: 100%; float: left;'>
+							<option selected>"; echo $select; echo"</option>";
+
+							for($year = date('Y')-6; $year >= 1960; $year--){
+							echo"
+							<option>{$year}</option>";
+							}
+
+							echo"
+						</select>
+					</div>
+				</div>
+			</div>
+			<br />
+			<legend>Contact</legend>
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Contact Phone:</span>
+				<input maxlength='11' type='phone' onkeypress='isInputNumber(event)' name='reg_student_phone' required
+					class='form-control' placeholder='Enter nearest phone number to you'
+					aria-describedby='basic-addon2'>
+			</div>
+			<br />
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Home Address:</span>
+				<textarea rows='3' name='reg_student_address' required class='form-control' placeholder='...'
+					aria-describedby='basic-addon2'></textarea>
+			</div>
+			<br />
+
+			<legend>Place Of Origin</legend>
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Nationality:</span>
+				<select class='form-control' name='reg_student_nationality'>
+					<option selected>"; echo $select; echo "</option>
+					<option>Nigerian</option>
+					<option>Non-nigerian</option>
+				</select>
+			</div>
+			<br />
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>State of Origin:</span>
+				<select onchange='toggleLGA(this);' name='reg_student_state' id='reg_student_state'
+					class='form-control'>
+					<option value='' selected='selected'>- Select -</option>
+					<option value='Abia'>Abia</option>
+					<option value='Adamawa'>Adamawa</option>
+					<option value='AkwaIbom'>AkwaIbom</option>
+					<option value='Anambra'>Anambra</option>
+					<option value='Bauchi'>Bauchi</option>
+					<option value='Bayelsa'>Bayelsa</option>
+					<option value='Benue'>Benue</option>
+					<option value='Borno'>Borno</option>
+					<option value='Cross River'>Cross River</option>
+					<option value='Delta'>Delta</option>
+					<option value='Ebonyi'>Ebonyi</option>
+					<option value='Edo'>Edo</option>
+					<option value='Ekiti'>Ekiti</option>
+					<option value='Enugu'>Enugu</option>
+					<option value='Abuja'>FCT</option>
+					<option value='Gombe'>Gombe</option>
+					<option value='Imo'>Imo</option>
+					<option value='Jigawa'>Jigawa</option>
+					<option value='Kaduna'>Kaduna</option>
+					<option value='Kano'>Kano</option>
+					<option value='Katsina'>Katsina</option>
+					<option value='Kebbi'>Kebbi</option>
+					<option value='Kogi'>Kogi</option>
+					<option value='Kwara'>Kwara</option>
+					<option value='Lagos'>Lagos</option>
+					<option value='Nassarawa'>Nassarawa</option>
+					<option value='Niger'>Niger</option>
+					<option value='Ogun'>Ogun</option>
+					<option value='Ondo'>Ondo</option>
+					<option value='Osun'>Osun</option>
+					<option value='Oyo'>Oyo</option>
+					<option value='Plateau'>Plateau</option>
+					<option value='Rivers'>Rivers</option>
+					<option value='Sokoto'>Sokoto</option>
+					<option value='Taraba'>Taraba</option>
+					<option value='Yobe'>Yobe</option>
+					<option value='Zamfara'>Zamafara</option>
+				</select>
+			</div>
+
+			<br />
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>LGA of Origin:</span>
+				<select name='reg_student_lga' id='lga' class='form-control select-lga' required>
+				</select>
+			</div>
+
+			<br />
+			<legend>Sponsor</legend>
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Name:</span>
+				<input type='text' name='reg_sponsor_name' required class='form-control'
+					placeholder='Enter sponsors name' aria-describedby='basic-addon2'>
+			</div>
+			<br />
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Phone:</span>
+				<input onkeypress='isInputNumber(event)' type='phone' name='reg_sponsor_phone' required
+					class='form-control' placeholder='Enter sponsors phone number' aria-describedby='basic-addon2'>
+			</div>
+			<br />
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Relationship:</span>
+				<select class='form-control' name='reg_sponsor_relationship'>
+					<option selected>"; echo $select; echo "</option>
+					<option>Self</option>
+					<option>Parent</option>
+					<option>Sibling</option>
+					<option>Guardian</option>
+					<option>Others</option>
+				</select>
+			</div>
+			<br />
+
+			<legend>Academics</legend>
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Targeted Class:</span>
+				<select class='form-control' name='reg_student_tc'>
+					<option selected>{$select}</option>";
+					$query = " SELECT * FROM `classes` ";
+					$run_query = mysqli_query($connection, $query);
+					if(mysqli_num_rows($run_query) > 0){
+					while($result = mysqli_fetch_assoc($run_query)){
+					$target_classes = $result['classes'];
+					echo"
+					<option>{$target_classes}</option>
+					";
+					}
+					}
+
+					echo"
+				</select>
+			</div>
+
+			<legend>Multimedia</legend>
+			<div class='input-group'>
+				<span class='input-group-addon' id='basic-addon2'>Passport:</span>
+				<input type='file' name='file' required class='form-control' aria-describedby='basic-addon2'>
+			</div>
+			<br />
+
+			<div class='text-center'>
+				<input type='submit' name='student_reg_btn' value='REGISTER NEW STUDENT' class='btn btn-primary' />
+			</div>
+		</form>
+		<button type='button' class='btn btn-default' onclick='window.print()' value='print a div!'><span
+				class='glyphicon glyphicon-print'></span> Print</button>
+	</div>
+</div>";
+}
